@@ -38,6 +38,7 @@
             border:1px solid #ccc;
             border-radius:8px;
             font-size:16px;
+            box-sizing: border-box;
         }
 
         button{
@@ -62,6 +63,15 @@
             border-radius:10px;
             font-size:18px;
         }
+
+        .error{
+            margin-top:20px;
+            padding:15px;
+            background:#ffcccc;
+            border-radius:10px;
+            font-size:16px;
+            color:#cc0000;
+        }
     </style>
 </head>
 <body>
@@ -76,6 +86,7 @@
             type="number" 
             name="nilai" 
             placeholder="Masukkan suhu"
+            step="0.01"
             required
         >
 
@@ -96,33 +107,44 @@
 
     if(isset($_POST['konversi'])){
 
-        $nilai = $_POST['nilai'];
+        $nilai = floatval($_POST['nilai']);
         $jenis = $_POST['jenis'];
 
         $hasil = "";
+        $error = "";
 
-        if($jenis == "c_to_f"){
-            $hasil = ($nilai * 9/5) + 32 . " °F";
+        // Validasi input
+        if(is_nan($nilai)){
+            $error = "Input harus berupa angka!";
+        } else {
+            if($jenis == "c_to_f"){
+                $hasil = round(($nilai * 9/5) + 32, 2) . " °F";
+            }
+            elseif($jenis == "f_to_c"){
+                $hasil = round(($nilai - 32) * 5/9, 2) . " °C";
+            }
+            elseif($jenis == "c_to_k"){
+                $hasil = round($nilai + 273.15, 2) . " K";
+            }
+            elseif($jenis == "k_to_c"){
+                $hasil = round($nilai - 273.15, 2) . " °C";
+            }
         }
 
-        elseif($jenis == "f_to_c"){
-            $hasil = ($nilai - 32) * 5/9 . " °C";
+        if(!empty($error)){
+            echo "
+            <div class='error'>
+                ⚠️ $error
+            </div>
+            ";
+        } else {
+            echo "
+            <div class='hasil'>
+                Hasil Konversi: <br><br>
+                <b>$hasil</b>
+            </div>
+            ";
         }
-
-        elseif($jenis == "c_to_k"){
-            $hasil = $nilai + 273.15 . " K";
-        }
-
-        elseif($jenis == "k_to_c"){
-            $hasil = $nilai - 273.15 . " °C";
-        }
-
-        echo "
-        <div class='hasil'>
-            Hasil Konversi: <br><br>
-            <b>$hasil</b>
-        </div>
-        ";
     }
 
     ?>
